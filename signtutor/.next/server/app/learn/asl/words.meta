@@ -1,0 +1,17 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/learn/layout,_N_T_/learn/asl/layout,_N_T_/learn/asl/words/layout,_N_T_/learn/asl/words/page,_N_T_/learn/asl/words"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/learn/asl/words/__PAGE__",
+    "/learn/asl/words",
+    "/learn/asl",
+    "/learn",
+    "/_index",
+    "/_head"
+  ]
+}

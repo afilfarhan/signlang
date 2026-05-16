@@ -1,0 +1,16 @@
+{
+  "/_global-error/page": "app/_global-error/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/about/page": "app/about/page.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/learn/asl/fingerspelling/[letter]/page": "app/learn/asl/fingerspelling/[letter]/page.js",
+  "/learn/asl/fingerspelling/page": "app/learn/asl/fingerspelling/page.js",
+  "/learn/asl/words/[slug]/page": "app/learn/asl/words/[slug]/page.js",
+  "/learn/asl/words/page": "app/learn/asl/words/page.js",
+  "/page": "app/page.js",
+  "/practice/page": "app/practice/page.js",
+  "/privacy/page": "app/privacy/page.js",
+  "/research/continuous/page": "app/research/continuous/page.js",
+  "/settings/page": "app/settings/page.js",
+  "/setup/page": "app/setup/page.js"
+}

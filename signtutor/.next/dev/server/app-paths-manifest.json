@@ -1,0 +1,9 @@
+{
+  "/page": "app/page.js",
+  "/learn/asl/fingerspelling/page": "app/learn/asl/fingerspelling/page.js",
+  "/learn/asl/words/page": "app/learn/asl/words/page.js",
+  "/learn/asl/words/[slug]/page": "app/learn/asl/words/[slug]/page.js",
+  "/practice/page": "app/practice/page.js",
+  "/setup/page": "app/setup/page.js",
+  "/learn/asl/fingerspelling/[letter]/page": "app/learn/asl/fingerspelling/[letter]/page.js"
+}

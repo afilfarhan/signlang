@@ -1,0 +1,16 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/research/layout,_N_T_/research/continuous/layout,_N_T_/research/continuous/page,_N_T_/research/continuous"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/research/continuous/__PAGE__",
+    "/research/continuous",
+    "/research",
+    "/_index",
+    "/_head"
+  ]
+}

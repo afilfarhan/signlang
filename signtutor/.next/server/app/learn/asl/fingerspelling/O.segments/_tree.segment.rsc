@@ -1,0 +1,2 @@
+:HL["/_next/static/chunks/0zx611.0c5gvk.css","style"]
+0:{"tree":{"name":"","param":null,"prefetchHints":16,"slots":{"children":{"name":"learn","param":null,"prefetchHints":0,"slots":{"children":{"name":"asl","param":null,"prefetchHints":0,"slots":{"children":{"name":"fingerspelling","param":null,"prefetchHints":0,"slots":{"children":{"name":"letter","param":{"type":"d","key":"O","siblings":null},"prefetchHints":0,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":0,"slots":null}}}}}}}}}}},"staleTime":300,"buildId":"gJQJrVLEfVabarebCB9PJ"}

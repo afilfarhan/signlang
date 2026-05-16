@@ -1,0 +1,141 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #0b1020;
+  --panel: #121935;
+  --panel2: #0f1530;
+  --ink: #e9ecff;
+  --muted: #9aa3c7;
+  --line: #2a335c;
+  --accent: #7c9cff;
+  --accent2: #5ee0c1;
+  --warn: #ffb86b;
+  --bad: #ff7a90;
+  --ok: #5ee0c1;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
+  line-height: 1.5;
+}
+
+/* Skip link for keyboard accessibility (PDR FR-5.3) */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 999;
+}
+.skip-link:focus {
+  left: 8px;
+  top: 8px;
+  background: var(--accent);
+  color: #0a0f24;
+  padding: 8px 12px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+/* Focus rings — WCAG 2.2 AA */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Reduced motion support (PDR FR-5.4) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--panel2);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
+}
+
+/* Badge / pill utilities */
+.badge {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.02);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.badge-ok {
+  color: var(--ok);
+  border-color: rgba(94, 224, 193, 0.45);
+  background: rgba(94, 224, 193, 0.08);
+}
+.badge-warn {
+  color: var(--warn);
+  border-color: rgba(255, 184, 107, 0.45);
+  background: rgba(255, 184, 107, 0.08);
+}
+.badge-bad {
+  color: var(--bad);
+  border-color: rgba(255, 122, 144, 0.45);
+  background: rgba(255, 122, 144, 0.08);
+}
+
+/* Verdict states */
+.verdict-match {
+  background: rgba(94, 224, 193, 0.1);
+  border-color: rgba(94, 224, 193, 0.45);
+}
+.verdict-match .verdict-value {
+  color: var(--ok);
+}
+.verdict-close {
+  background: rgba(255, 184, 107, 0.1);
+  border-color: rgba(255, 184, 107, 0.45);
+}
+.verdict-close .verdict-value {
+  color: var(--warn);
+}
+.verdict-miss {
+  background: rgba(255, 122, 144, 0.1);
+  border-color: rgba(255, 122, 144, 0.45);
+}
+.verdict-miss .verdict-value {
+  color: var(--bad);
+}
+
+/* Pulse animation for demo sign */
+@keyframes pulse {
+  0%, 100% { transform: scale(0.85); opacity: 0.35; }
+  50%       { transform: scale(1.05); opacity: 0.6; }
+}
+.animate-pulse-slow {
+  animation: pulse 1.6s ease-in-out infinite;
+}
