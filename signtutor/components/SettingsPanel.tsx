@@ -3,14 +3,25 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { isEnabled, enableFlag, disableFlag, getAllFlags, type FeatureFlag } from "@/lib/featureFlags";
 import { PersonalAdapter } from "@/lib/personalAdapter";
+import { getFSRSConfig, saveFSRSConfig, type FSRSConfig } from "@/lib/progress";
 
 export default function SettingsPanel() {
   const [flags, setFlags] = useState<Record<FeatureFlag, boolean>>({ nmm: false, personalization: false, bsl: false, continuous: false, webgpu: false });
   const [adapterInfo, setAdapterInfo] = useState<{ attempts: number; lastUpdated: string } | null>(null);
   const [nmmConsentShown, setNmmConsentShown] = useState(false);
+  const [fsrsConfig, setFsrsConfig] = useState<FSRSConfig>({
+    desiredRetention: 0.9,
+    maximumInterval: 36500,
+    enableShortTerm: true,
+    learningSteps: ["1m", "10m"],
+    relearningSteps: ["10m"],
+    enableFuzz: false,
+    version: "FSRS-5",
+  });
 
   useEffect(() => {
     setFlags(getAllFlags());
+    setFsrsConfig(getFSRSConfig());
     // Load adapter info
     const adapter = PersonalAdapter.load(64, 10);
     if (adapter.confirmedAttempts > 0) {
@@ -38,6 +49,12 @@ export default function SettingsPanel() {
       PersonalAdapter.reset();
       setAdapterInfo(null);
     }
+  };
+
+  const handleFsrsConfigChange = <K extends keyof FSRSConfig>(key: K, value: FSRSConfig[K]) => {
+    const newConfig = { ...fsrsConfig, [key]: value };
+    setFsrsConfig(newConfig);
+    saveFSRSConfig(newConfig);
   };
 
   const FLAG_INFO: Record<FeatureFlag, { label: string; desc: string; badge?: string }> = {
@@ -94,6 +111,140 @@ export default function SettingsPanel() {
               Camera preferences (mirror, handedness, language) are set in the{" "}
               <Link href="/setup" style={{ color: "var(--accent)" }}>setup wizard</Link>.
             </p>
+          </div>
+        </section>
+
+        {/* FSRS-5 Spaced Repetition Configuration */}
+        <section aria-labelledby="fsrs-heading" style={{ marginBottom: 32 }}>
+          <h2 id="fsrs-heading" style={{ fontSize: 18, marginBottom: 4 }}>Spaced Repetition (FSRS-5)</h2>
+          <p style={{ color: "var(--muted)", fontSize: 14, marginBottom: 16 }}>
+            Free Spaced Repetition Scheduler v5 — adapts to your memory. Higher retention = more reviews.
+            <Link href="/practice" style={{ color: "var(--accent)", marginLeft: 8 }}>Test in Practice →</Link>
+          </p>
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            {/* Desired Retention */}
+            <div style={{ background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 10, padding: "16px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
+                <strong style={{ fontSize: 15, minWidth: 180 }}>Target Retention</strong>
+                <input
+                  type="range"
+                  min="0.85"
+                  max="0.97"
+                  step="0.01"
+                  value={fsrsConfig.desiredRetention}
+                  onChange={(e) => handleFsrsConfigChange("desiredRetention", parseFloat(e.target.value))}
+                  style={{ flex: 1, accentColor: "var(--accent)" }}
+                  aria-label="Target retention"
+                />
+                <span style={{ fontSize: 18, fontWeight: 700, minWidth: 60, textAlign: "right", color: "var(--accent)" }}>
+                  {Math.round(fsrsConfig.desiredRetention * 100)}%
+                </span>
+              </div>
+              <p style={{ margin: 0, color: "var(--muted)", fontSize: 13 }}>
+                Probability of recalling a sign at review time. 90% = you'll forget ~10% of due cards.
+                Higher values increase review frequency. Recommended: 85–95%.
+              </p>
+            </div>
+
+            {/* Maximum Interval */}
+            <div style={{ background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 10, padding: "16px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
+                <strong style={{ fontSize: 15, minWidth: 180 }}>Maximum Interval</strong>
+                <input
+                  type="number"
+                  min="30"
+                  max="36500"
+                  step="30"
+                  value={fsrsConfig.maximumInterval}
+                  onChange={(e) => handleFsrsConfigChange("maximumInterval", parseInt(e.target.value, 10))}
+                  style={{ width: 100, padding: "6px 10px", border: "1px solid var(--line)", borderRadius: 6, background: "var(--panel2)", color: "var(--ink)" }}
+                  aria-label="Maximum interval in days"
+                />
+                <span style={{ color: "var(--muted)", fontSize: 13 }}>days</span>
+              </div>
+              <p style={{ margin: 0, color: "var(--muted)", fontSize: 13 }}>
+                Cap on how long a sign can go without review. Default: 10 years (36500 days).
+              </p>
+            </div>
+
+            {/* Enable Short Term / Learning Steps */}
+            <div style={{ background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 10, padding: "16px" }}>
+              <label style={{ display: "flex", alignItems: "center", gap: 12, cursor: "pointer" }}>
+                <input
+                  type="checkbox"
+                  checked={fsrsConfig.enableShortTerm}
+                  onChange={(e) => handleFsrsConfigChange("enableShortTerm", e.target.checked)}
+                  style={{ accentColor: "var(--accent)", width: 18, height: 18 }}
+                />
+                <strong style={{ fontSize: 15 }}>Enable learning steps (short-term scheduling)</strong>
+              </label>
+              <p style={{ margin: "8px 0 0", color: "var(--muted)", fontSize: 13 }}>
+                When on, new signs go through explicit learning steps before graduating to long-term review.
+              </p>
+              {fsrsConfig.enableShortTerm && (
+                <div style={{ marginTop: 12, display: "flex", flexDirection: "column", gap: 8 }}>
+                  <div>
+                    <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--muted)" }}>
+                      Learning steps:
+                      <input
+                        type="text"
+                        value={fsrsConfig.learningSteps.join(", ")}
+                        onChange={(e) => handleFsrsConfigChange("learningSteps", e.target.value.split(",").map(s => s.trim()).filter(Boolean))}
+                        style={{ flex: 1, padding: "4px 8px", border: "1px solid var(--line)", borderRadius: 4, background: "var(--panel2)", color: "var(--ink)", fontSize: 12 }}
+                        placeholder="e.g., 1m, 10m"
+                      />
+                    </label>
+                  </div>
+                  <div>
+                    <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--muted)" }}>
+                      Relearning steps:
+                      <input
+                        type="text"
+                        value={fsrsConfig.relearningSteps.join(", ")}
+                        onChange={(e) => handleFsrsConfigChange("relearningSteps", e.target.value.split(",").map(s => s.trim()).filter(Boolean))}
+                        style={{ flex: 1, padding: "4px 8px", border: "1px solid var(--line)", borderRadius: 4, background: "var(--panel2)", color: "var(--ink)", fontSize: 12 }}
+                        placeholder="e.g., 10m"
+                      />
+                    </label>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Enable Fuzz */}
+            <div style={{ background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 10, padding: "16px" }}>
+              <label style={{ display: "flex", alignItems: "center", gap: 12, cursor: "pointer" }}>
+                <input
+                  type="checkbox"
+                  checked={fsrsConfig.enableFuzz}
+                  onChange={(e) => handleFsrsConfigChange("enableFuzz", e.target.checked)}
+                  style={{ accentColor: "var(--accent)", width: 18, height: 18 }}
+                />
+                <strong style={{ fontSize: 15 }}>Add interval fuzz (randomization)</strong>
+              </label>
+              <p style={{ margin: "8px 0 0", color: "var(--muted)", fontSize: 13 }}>
+                Adds small random variation to intervals to prevent cards from clumping on the same day.
+              </p>
+            </div>
+
+            {/* FSRS Version */}
+            <div style={{ background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 10, padding: "16px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <strong style={{ fontSize: 15, minWidth: 180 }}>FSRS Algorithm Version</strong>
+                <select
+                  value={fsrsConfig.version}
+                  onChange={(e) => handleFsrsConfigChange("version", e.target.value as "FSRS-5" | "FSRS-6" | "FSRS-7")}
+                  style={{ padding: "6px 10px", border: "1px solid var(--line)", borderRadius: 6, background: "var(--panel2)", color: "var(--ink)", fontSize: 13 }}
+                >
+                  <option value="FSRS-5">FSRS-5 (Stable, well-tested)</option>
+                  <option value="FSRS-6">FSRS-6 (Improved stability modeling)</option>
+                  <option value="FSRS-7">FSRS-7 (Latest, dual stability)</option>
+                </select>
+              </div>
+              <p style={{ margin: "8px 0 0", color: "var(--muted)", fontSize: 13 }}>
+                Changing version resets scheduling for future reviews. Existing progress is preserved.
+              </p>
+            </div>
           </div>
         </section>
 
